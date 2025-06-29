@@ -1,0 +1,416 @@
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Casino-X 🎰</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://i.ibb.co/fxNZGLK/candle-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+    .container {
+      padding: 20px;
+      text-align: center;
+      backdrop-filter: blur(6px);
+    }
+    input, button {
+      padding: 12px;
+      margin: 6px;
+      width: 90%;
+      max-width: 320px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+    input {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+    button {
+      background: gold;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .hidden {
+      display: none;
+    }
+    .game-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    .game-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      cursor: pointer;
+      color: #fff;
+      font-weight: bold;
+    }
+    .game-icon:hover {
+      background: gold;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="authSection">
+    <h2>🎰 Welcome to Casino-X</h2>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <label>
+      <input type="checkbox" id="ageCheck"> I am 18+ and agree to the terms.
+    </label><br>
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+    <p id="authError" style="color: red;"></p>
+  </div>
+
+  <div class="container hidden" id="dashboard">
+    <h2>🎮 Casino-X Dashboard</h2>
+    <p><strong>User:</strong> <span id="userEmail"></span></p>
+    <p><strong>Balance:</strong> $<span id="userBalance">0</span></p>
+    <button onclick="showProfile()">👤 Profile</button>
+    <button onclick="logout()">🚪 Logout</button>
+
+    <h3>🎲 Select a Game</h3>
+    <div class="game-grid">
+      <div class="game-icon" onclick="navigateTo('mines')">💣<br>Mines</div>
+      <div class="game-icon" onclick="navigateTo('spinbottle')">🍾<br>Spin Bottle</div>
+      <div class="game-icon" onclick="navigateTo('rolex')">⌚<br>Rolex</div>
+      <div class="game-icon" onclick="navigateTo('fruit')">🍒<br>Fruit Hunt</div>
+      <div class="game-icon" onclick="navigateTo('spintowin')">🎡<br>Spin to Win</div>
+      <div class="game-icon" onclick="navigateTo('aviator')">✈️<br>Aviator</div>
+      <div class="game-icon" onclick="navigateTo('hero')">🚂<br>Casino Hero</div>
+      <div class="game-icon" onclick="navigateTo('pingpong')">🏓<br>Ping Pong</div>
+      <div class="game-icon" onclick="navigateTo('wicket')">🏏<br>Wicket Blast</div>
+    </div>
+  </div>
+
+  <div class="container hidden" id="profilePage">
+    <h2>👤 Your Profile</h2>
+    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+    <p><strong>Balance:</strong> $<span id="profileBalance"></span></p>
+    <button onclick="openPaystack()">💳 Deposit</button>
+    <input type="number" id="withdrawAmount" placeholder="Withdraw amount ($5 min)">
+    <button onclick="withdraw()">💵 Withdraw</button>
+    <p id="withdrawStatus"></p>
+    <button onclick="backToDashboard()">⬅️ Back</button>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDOfuS7bXfY8AouF3SoP17jzCQTPH90K9w",
+      authDomain: "casino-x-87092.firebaseapp.com",
+      databaseURL: "https://casino-x-87092-default-rtdb.firebaseio.com",
+      projectId: "casino-x-87092",
+      storageBucket: "casino-x-87092.appspot.com",
+      messagingSenderId: "834980865993",
+      appId: "1:834980865993:android:77964ded59f8fcb97fea18"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    function register() {
+      const email = email.value;
+      const password = password.value;
+      if (!document.getElementById("ageCheck").checked) {
+        document.getElementById("authError").innerText = "Confirm you're 18+.";
+        return;
+      }
+      firebase.auth().createUserWithEmailAndPassword(email, password).then(cred => {
+        firebase.database().ref("users/" + cred.user.uid).set({ email, balance: 9 });
+      }).catch(e => {
+        document.getElementById("authError").innerText = e.message;
+      });
+    }
+
+    function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      firebase.auth().signInWithEmailAndPassword(email, password).catch(e => {
+        document.getElementById("authError").innerText = e.message;
+      });
+    }
+
+    function logout() {
+      firebase.auth().signOut();
+    }
+
+    function openPaystack() {
+      window.open("https://paystack.com/buy/casino-x-wgojzd", "_blank");
+    }
+
+    function withdraw() {
+      const amount = parseFloat(document.getElementById("withdrawAmount").value);
+      if (amount < 5) return alert("Minimum is $5");
+      const user = firebase.auth().currentUser;
+      const ref = firebase.database().ref("users/" + user.uid);
+      ref.once("value").then(snap => {
+        let bal = snap.val().balance;
+        if (bal < amount) return alert("Not enough funds.");
+        bal -= amount;
+        ref.update({ balance: bal });
+        document.getElementById("withdrawStatus").innerText = "Withdrawal requested.";
+      });
+    }
+
+    function navigateTo(id) {
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("game_" + id).classList.remove("hidden");
+    }
+
+    function backToDashboard() {
+      document.querySelectorAll(".container").forEach(div => div.classList.add("hidden"));
+      document.getElementById("dashboard").classList.remove("hidden");
+    }
+
+    function showProfile() {
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("profilePage").classList.remove("hidden");
+      const user = firebase.auth().currentUser;
+      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+        document.getElementById("profileEmail").innerText = snap.val().email;
+        document.getElementById("profileBalance").innerText = snap.val().balance;
+      });
+    }
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("authSection").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("userEmail").innerText = user.email;
+        firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+          document.getElementById("userBalance").innerText = snap.val().balance;
+        });
+      } else {
+        document.getElementById("authSection").classList.remove("hidden");
+        document.getElementById("dashboard").classList.add("hidden");
+      }
+    });
+  </script>
+  <!-- ==== GAMES START HERE ==== -->
+
+<!-- MINES GAME -->
+<div class="container hidden" id="game_mines">
+  <h2>💣 Mines</h2>
+  <p>Select bet and number of mines</p>
+  <input type="number" id="minesBet" placeholder="Bet amount">
+  <input type="number" id="mineCount" placeholder="Number of mines (1-24)">
+  <button onclick="startMines()">Start Game</button>
+  <div id="minesGrid" style="margin-top:15px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px;"></div>
+  <div id="minesStatus"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- SPIN THE BOTTLE -->
+<div class="container hidden" id="game_spinbottle">
+  <h2>🍾 Spin the Bottle</h2>
+  <input type="number" id="bottleBet" placeholder="Enter bet amount">
+  <button onclick="spinBottle()">Spin</button>
+  <div id="bottleResult" style="margin-top:10px;"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- ROLEX GAME -->
+<div class="container hidden" id="game_rolex">
+  <h2>⌚ Rolex Spin</h2>
+  <input type="number" id="rolexBet" placeholder="Enter bet amount">
+  <button onclick="playRolex()">Spin</button>
+  <div id="rolexResult" style="margin-top:10px;"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- FRUIT HUNT -->
+<div class="container hidden" id="game_fruit">
+  <h2>🍒 Fruit Hunt</h2>
+  <input type="number" id="fruitBet" placeholder="Bet amount">
+  <button onclick="huntFruit()">Hunt</button>
+  <div id="fruitResult" style="margin-top:10px;"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- SPIN TO WIN -->
+<div class="container hidden" id="game_spintowin">
+  <h2>🎡 Spin to Win</h2>
+  <input type="number" id="spinBet" placeholder="Enter bet">
+  <button onclick="spinWin()">Spin</button>
+  <div id="spinResult" style="margin-top:10px;"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- AVIATOR -->
+<div class="container hidden" id="game_aviator">
+  <h2>✈️ Aviator</h2>
+  <input type="number" id="aviatorBet" placeholder="Enter bet">
+  <button onclick="flyAviator()">Fly</button>
+  <div id="aviatorOdds"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- CASINO HERO -->
+<div class="container hidden" id="game_hero">
+  <h2>🚂 Casino Hero</h2>
+  <input type="number" id="heroBet" placeholder="Enter bet">
+  <button onclick="startHero()">Start</button>
+  <div id="heroOdds"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- PING PONG -->
+<div class="container hidden" id="game_pingpong">
+  <h2>🏓 Ping Pong</h2>
+  <input type="number" id="pingBet" placeholder="Enter bet">
+  <button onclick="playPing()">Play</button>
+  <div id="pingResult"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<!-- WICKET BLAST -->
+<div class="container hidden" id="game_wicket">
+  <h2>🏏 Wicket Blast</h2>
+  <input type="number" id="wicketBet" placeholder="Enter bet">
+  <button onclick="blastWicket()">Blast</button>
+  <div id="wicketResult"></div>
+  <button onclick="backToDashboard()">⬅️ Back</button>
+</div>
+
+<script>
+  // MINES
+  function startMines() {
+    const bet = parseFloat(document.getElementById("minesBet").value);
+    const mines = parseInt(document.getElementById("mineCount").value);
+    const grid = document.getElementById("minesGrid");
+    if (isNaN(bet) || isNaN(mines) || mines < 1 || mines > 24) {
+      document.getElementById("minesStatus").innerText = "Invalid bet or mines count.";
+      return;
+    }
+    firebase.database().ref("users/" + firebase.auth().currentUser.uid).once("value").then(snap => {
+      let bal = snap.val().balance;
+      if (bal < bet) return alert("Insufficient balance");
+      let mineSet = new Set();
+      while (mineSet.size < mines) mineSet.add(Math.floor(Math.random() * 25));
+      grid.innerHTML = "";
+      for (let i = 0; i < 25; i++) {
+        let btn = document.createElement("button");
+        btn.style.width = "60px";
+        btn.style.height = "60px";
+        btn.innerText = "❔";
+        btn.onclick = () => {
+          if (mineSet.has(i)) {
+            btn.innerText = "💥";
+            grid.querySelectorAll("button").forEach(b => b.disabled = true);
+            document.getElementById("minesStatus").innerText = "❌ You hit a mine!";
+            firebase.database().ref("users/" + firebase.auth().currentUser.uid).update({ balance: bal - bet });
+          } else {
+            btn.innerText = "✅";
+            document.getElementById("minesStatus").innerText = "🎉 You won!";
+            firebase.database().ref("users/" + firebase.auth().currentUser.uid).update({ balance: bal + bet });
+          }
+        };
+        grid.appendChild(btn);
+      }
+    });
+  }
+
+  // SPIN BOTTLE
+  function spinBottle() {
+    const bet = parseFloat(document.getElementById("bottleBet").value);
+    if (!bet) return;
+    const result = Math.random() < 0.5 ? "❌ You lost." : "🎉 You won!";
+    document.getElementById("bottleResult").innerText = result;
+    updateBet("bottleBet", result.includes("won"));
+  }
+
+  // ROLEX
+  function playRolex() {
+    const bet = parseFloat(document.getElementById("rolexBet").value);
+    if (!bet) return;
+    const result = Math.random() < 0.5 ? "❌ Lost" : "🎉 Won!";
+    document.getElementById("rolexResult").innerText = result;
+    updateBet("rolexBet", result.includes("Won"));
+  }
+
+  // FRUIT HUNT
+  function huntFruit() {
+    const bet = parseFloat(document.getElementById("fruitBet").value);
+    if (!bet) return;
+    const result = Math.random() < 0.5 ? "No fruit found ❌" : "Fruit caught 🍓 🎉";
+    document.getElementById("fruitResult").innerText = result;
+    updateBet("fruitBet", result.includes("🎉"));
+  }
+
+  // SPIN TO WIN
+  function spinWin() {
+    const bet = parseFloat(document.getElementById("spinBet").value);
+    if (!bet) return;
+    const result = Math.random() < 0.5 ? "❌ Try Again" : "🎉 You won big!";
+    document.getElementById("spinResult").innerText = result;
+    updateBet("spinBet", result.includes("won"));
+  }
+
+  // AVIATOR
+  function flyAviator() {
+    const bet = parseFloat(document.getElementById("aviatorBet").value);
+    if (!bet) return;
+    const odds = (Math.random() * 10).toFixed(2);
+    document.getElementById("aviatorOdds").innerText = `🚀 Plane flew to ${odds}x`;
+    updateBet("aviatorBet", parseFloat(odds) > 2);
+  }
+
+  // CASINO HERO
+  function startHero() {
+    const bet = parseFloat(document.getElementById("heroBet").value);
+    if (!bet) return;
+    const odds = (Math.random() * 5).toFixed(2);
+    document.getElementById("heroOdds").innerText = `🚂 Train reached ${odds}x`;
+    updateBet("heroBet", parseFloat(odds) > 2);
+  }
+
+  // PING PONG
+  function playPing() {
+    const bet = parseFloat(document.getElementById("pingBet").value);
+    if (!bet) return;
+    const win = Math.random() > 0.5;
+    document.getElementById("pingResult").innerText = win ? "🏓 You scored!" : "Missed ❌";
+    updateBet("pingBet", win);
+  }
+
+  // WICKET BLAST
+  function blastWicket() {
+    const bet = parseFloat(document.getElementById("wicketBet").value);
+    if (!bet) return;
+    const win = Math.random() > 0.5;
+    document.getElementById("wicketResult").innerText = win ? "🏏 Clean Hit!" : "❌ Missed";
+    updateBet("wicketBet", win);
+  }
+
+  // Common update logic
+  function updateBet(inputId, win) {
+    const amount = parseFloat(document.getElementById(inputId).value);
+    const user = firebase.auth().currentUser;
+    firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+      let bal = snap.val().balance;
+      let newBal = win ? bal + amount : bal - amount;
+      firebase.database().ref("users/" + user.uid).update({ balance: newBal });
+      document.getElementById("userBalance").innerText = newBal;
+    });
+  }
+</script>
+
+<!-- END -->
+</body>
+</html>
