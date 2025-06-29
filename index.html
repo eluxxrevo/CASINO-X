@@ -1,9 +1,10 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Casino-X 🎰</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -57,59 +58,103 @@
       background: #0f0;
       color: #000;
     }
-    .container {
-      display: none;
+    .mine-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
     }
-    .active {
-      display: block;
+    .cell {
+      width: 50px;
+      height: 50px;
+      background: #111;
+      color: #0f0;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+    .cell.revealed {
+      background: #0f0;
+      color: #000;
+    }
+    .cell.mine {
+      background: red;
+      color: white;
     }
   </style>
 </head>
 <body>
   <h1>🎰 Casino-X</h1>
+
+  <!-- Auth Section -->
   <div id="auth">
     <h2>Register / Login</h2>
-    <input type="email" id="email" placeholder="Email"><br>
-    <input type="password" id="password" placeholder="Password"><br>
+    <input type="email" id="email" placeholder="Email" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
     <label>
-      <input type="checkbox" id="ageCheck"> I am 18+ and agree to the <a href="terms.html" target="_blank">Terms</a>
-    </label><br>
+      <input type="checkbox" id="ageCheck" /> I am 18+ and agree to the
+      <a href="terms.html" target="_blank">Terms</a>
+    </label><br />
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
     <p id="error" style="color:red;"></p>
-  </div>  <div id="dashboard" class="hidden">
-    <h2>Welcome, <span id="userEmail"></span></h2>
-    <p><strong>Balance:</strong> $<span id="userBalance">0</span></p><div class="game-grid">
-  <div class="game-icon" onclick="goToGame('game_mines')">💣 Mines</div>
-  <div class="game-icon" onclick="goToGame('game_spinbottle')">🍾 Spin Bottle</div>
-  <div class="game-icon" onclick="goToGame('game_rolex')">⌚ Rolex</div>
-  <div class="game-icon" onclick="goToGame('game_fruit')">🍒 Fruit Hunt</div>
-  <div class="game-icon" onclick="goToGame('game_spintowin')">🎡 Spin to Win</div>
-  <div class="game-icon" onclick="goToGame('game_aviator')">✈️ Aviator</div>
-  <div class="game-icon" onclick="goToGame('game_hero')">🚂 Casino Hero</div>
-  <div class="game-icon" onclick="goToGame('game_pingpong')">🏓 Ping Pong</div>
-  <div class="game-icon" onclick="goToGame('game_wicket')">🏏 Wicket Blast</div>
-</div>
-<br>
-<button onclick="goToProfile()">👤 Profile</button>
-<br><br>
-<button onclick="logout()">Logout</button>
+  </div>
 
-  </div>  <div id="profile" class="hidden">
-    <h3>👤 Profile</h3>
-    <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-    <p><strong>Balance:</strong> $<span id="profileBalance"></span></p>
-    <a href="https://paystack.com/buy/casino-x-wgojzd" target="_blank">
-      <button>💰 Deposit (Min $3)</button>
-    </a>
-    <br><br>
-    <input type="number" id="withdrawAmount" placeholder="Amount to withdraw">
-    <button onclick="withdraw()">Withdraw</button>
-    <button onclick="viewHistory()">📜 Transaction History</button>
-    <button onclick="contactSupport()">📞 Customer Care</button>
-    <br><br>
-    <button onclick="backToDashboard()">⬅️ Back to Dashboard</button>
-  </div>  <script>
+  <!-- Dashboard -->
+  <div id="dashboard" class="hidden">
+    <h2>Welcome, <span id="userEmail"></span></h2>
+    <p><strong>Balance:</strong> $<span id="userBalance">0</span></p>
+
+    <div class="game-grid">
+      <div class="game-icon" onclick="showGame('mines')">💣 Mines</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🎡 Spin the Bottle</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">⌚ Rolex</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🍉 Fruit Hunt</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🎯 Spin to Win</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">✈️ Aviator</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🚂 Casino Hero</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🏓 Ping Pong</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🏏 Wicket Blast</div>
+      <div class="game-icon" onclick="alert('Coming soon!')">🔢 Number Drop</div>
+    </div>
+
+    <br />
+    <button onclick="goToProfile()">👤 Profile</button>
+    <br /><br />
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <!-- Game: Mines -->
+  <div id="game-mines" class="hidden">
+    <h3>💣 Mines Game</h3>
+    <p>Number of mines (1–24):</p>
+    <input type="number" id="mineCount" min="1" max="24" placeholder="Mines" />
+    <input type="number" id="betAmount" placeholder="Bet amount" />
+    <button onclick="startMinesGame()">Start Game</button>
+    <div class="mine-grid" id="mineGrid"></div>
+    <p id="mineResult"></p>
+    <button onclick="backToDashboard()">⬅️ Back</button>
+  </div
+    <!-- Profile Page -->
+  <div id="profile" class="hidden">
+    <h2>👤 User Profile</h2>
+    <p>Email: <span id="profileEmail"></span></p>
+    <p>Balance: $<span id="profileBalance">0</span></p>
+    <br />
+    <button onclick="window.open('https://paystack.com/buy/casino-x-wgojzd')">💳 Deposit</button><br />
+    <input type="number" id="withdrawAmount" placeholder="Withdraw amount (min $5)" />
+    <button onclick="withdraw()">Withdraw</button><br />
+    <button onclick="alert('Customer Care: casinoxsupport@example.com')">📞 Customer Care</button><br /><br />
+    <button onclick="backToDashboard()">⬅️ Back</button>
+  </div>
+
+  <p style="margin-top: 50px; color: #888;">Endorsed by Reverend</p>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDOfuS7bXfY8AouF3SoP17jzCQTPH90K9w",
       authDomain: "casino-x-87092.firebaseapp.com",
@@ -122,99 +167,144 @@
     firebase.initializeApp(firebaseConfig);
 
     function register() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+      const email = emailInput.value;
+      const password = passwordInput.value;
       const ageChecked = document.getElementById("ageCheck").checked;
 
       if (!ageChecked) {
-        document.getElementById("error").innerText = "You must confirm you are 18+.";
+        error.textContent = "You must confirm you're 18+.";
         return;
       }
 
       firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(cred => {
-          return firebase.database().ref("users/" + cred.user.uid).set({
+        .then((cred) => {
+          firebase.database().ref("users/" + cred.user.uid).set({
             email: email,
-            balance: 9
+            balance: 9  // $10 starting - $1 registration fee
           });
         })
-        .catch(e => {
-          document.getElementById("error").innerText = e.message;
-        });
+        .catch(err => error.textContent = err.message);
     }
 
     function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .catch(e => {
-          document.getElementById("error").innerText = e.message;
-        });
+      firebase.auth().signInWithEmailAndPassword(
+        emailInput.value,
+        passwordInput.value
+      ).catch(err => error.textContent = err.message);
     }
 
     function logout() {
       firebase.auth().signOut();
     }
 
-    function goToGame(id) {
-      alert("Opening " + id + ". Game pages coming soon with full functionality.");
+    function showGame(game) {
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("game-" + game).classList.remove("hidden");
+    }
+
+    function backToDashboard() {
+      document.querySelectorAll("div[id^='game-']").forEach(div => div.classList.add("hidden"));
+      document.getElementById("profile").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+      updateBalance();
     }
 
     function goToProfile() {
       const user = firebase.auth().currentUser;
       if (!user) return;
-      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
-        const data = snap.val();
-        document.getElementById("profileEmail").innerText = data.email;
-        document.getElementById("profileBalance").innerText = data.balance;
-      });
       document.getElementById("dashboard").classList.add("hidden");
       document.getElementById("profile").classList.remove("hidden");
+      document.getElementById("profileEmail").textContent = user.email;
+      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+        document.getElementById("profileBalance").textContent = snap.val().balance || 0;
+      });
     }
 
-    function backToDashboard() {
-      document.getElementById("profile").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
+    function withdraw() {
+      const amount = Number(document.getElementById("withdrawAmount").value);
+      const user = firebase.auth().currentUser;
+      if (!user || amount < 5) return alert("Minimum withdrawal is $5");
+      const ref = firebase.database().ref("users/" + user.uid);
+      ref.once("value").then(snap => {
+        const bal = snap.val().balance;
+        if (bal < amount) return alert("Insufficient funds.");
+        ref.update({ balance: bal - amount });
+        alert("Withdrawal request of $" + amount + " sent!");
+        updateBalance();
+      });
+    }
+
+    function updateBalance() {
+      const user = firebase.auth().currentUser;
+      if (!user) return;
+      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+        const bal = snap.val().balance || 0;
+        document.getElementById("userBalance").textContent = bal;
+        document.getElementById("profileBalance").textContent = bal;
+        document.getElementById("profileEmail").textContent = user.email;
+      });
     }
 
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        document.getElementById("auth").classList.add("hidden");
-        document.getElementById("dashboard").classList.remove("hidden");
-        document.getElementById("userEmail").innerText = user.email;
-        firebase.database().ref("users/" + user.uid).once("value").then(snap => {
-          document.getElementById("userBalance").innerText = snap.val().balance;
-        });
+        auth.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+        userEmail.textContent = user.email;
+        updateBalance();
       } else {
-        document.getElementById("auth").classList.remove("hidden");
-        document.getElementById("dashboard").classList.add("hidden");
+        auth.classList.remove("hidden");
+        dashboard.classList.add("hidden");
       }
     });
 
-    function withdraw() {
-      const amount = parseFloat(document.getElementById("withdrawAmount").value);
+    // Mines Game Logic
+    let mineData = [];
+    function startMinesGame() {
+      const count = Number(document.getElementById("mineCount").value);
+      const bet = Number(document.getElementById("betAmount").value);
       const user = firebase.auth().currentUser;
-      if (!user || isNaN(amount) || amount < 5) return alert("Enter a valid amount. Minimum is $5");
-      const ref = firebase.database().ref("users/" + user.uid);
-      ref.once("value").then(snap => {
-        const balance = snap.val().balance || 0;
-        if (balance >= amount) {
-          ref.update({ balance: balance - amount });
-          alert("Withdraw request of $" + amount + " submitted.");
-          document.getElementById("withdrawAmount").value = "";
-        } else {
-          alert("Insufficient balance.");
+      if (!user || count < 1 || count > 24 || bet <= 0) return;
+
+      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+        const bal = snap.val().balance || 0;
+        if (bal < bet) return alert("Insufficient balance.");
+        firebase.database().ref("users/" + user.uid).update({ balance: bal - bet });
+        mineData = Array(25).fill("safe");
+        let placed = 0;
+        while (placed < count) {
+          const i = Math.floor(Math.random() * 25);
+          if (mineData[i] === "safe") {
+            mineData[i] = "mine";
+            placed++;
+          }
         }
+        renderMineGrid();
+        document.getElementById("mineResult").innerText = "Click safe tiles";
       });
     }
 
-    function viewHistory() {
-      alert("Transaction history under development.");
+    function renderMineGrid() {
+      const grid = document.getElementById("mineGrid");
+      grid.innerHTML = "";
+      mineData.forEach((type, idx) => {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.onclick = () => revealCell(div, idx);
+        grid.appendChild(div);
+      });
     }
 
-    function contactSupport() {
-      alert("Support: support@casino-x.com");
+    function revealCell(cell, idx) {
+      if (cell.classList.contains("revealed")) return;
+      cell.classList.add("revealed");
+      if (mineData[idx] === "mine") {
+        cell.classList.add("mine");
+        document.getElementById("mineResult").innerText = "💥 You hit a mine! Game over.";
+      } else {
+        cell.innerText = "✔️";
+        document.getElementById("mineResult").innerText = "✅ Safe! Keep going.";
+      }
     }
-  </script>  <p style="margin-top:50px;font-size:14px;opacity:0.8;">Endorsed by Reverend</p>
+  </script>
 </body>
-      </html
+</html>
