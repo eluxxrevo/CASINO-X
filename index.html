@@ -33,12 +33,20 @@
     .hidden {
       display: none;
     }
-    .game-link {
-      display: block;
-      margin: 10px 0;
-      font-size: 18px;
+    .game-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .game-card {
+      width: 140px;
+      background: #111;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
       color: #0f0;
-      text-decoration: underline;
     }
     .footer {
       margin-top: 40px;
@@ -60,17 +68,11 @@
       border-radius: 5px;
       cursor: pointer;
     }
-    #profileSection {
-      margin-top: 30px;
-      background: rgba(0, 0, 0, 0.2);
-      padding: 15px;
-      border-radius: 10px;
-    }
   </style>
 </head>
 <body>
   <div id="auth" class="container">
-    <h1>Welcome to Casino-X 🎰</h1>
+    <h1>Casino-X 🎰</h1>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password"><br>
     <label><input type="checkbox" id="ageCheck"> I am 18+ and agree to the Terms</label><br>
@@ -78,17 +80,18 @@
     <button onclick="login()">Login</button>
     <p id="error" style="color:red"></p>
   </div>  <div id="dashboard" class="container hidden">
-    <h2>Hello, <span id="userEmail"></span> 👋</h2>
-    <p>Balance: $<span id="userBalance">0</span></p><h3>Casino Games 🎮</h3>
-<a class="game-link" href="#" onclick="loadGame('mines')">💣 Mines</a>
-<a class="game-link" href="#" onclick="loadGame('aviator')">✈ Aviator</a>
-
-<div id="profileSection">
-  <h3>👤 Profile</h3>
-  <button onclick="deposit()">💵 Deposit</button>
-  <button onclick="withdraw()">💸 Withdraw</button>
-  <h4>Transactions</h4>
-  <ul id="history"></ul>
+    <h2>Hello, <span id="userEmail"></span></h2>
+    <p>Balance: $<span id="userBalance">10</span></p><div class="game-grid">
+  <div class="game-card" onclick="loadGame('mines')">💣 Mines</div>
+  <div class="game-card" onclick="loadGame('aviator')">✈ Aviator</div>
+  <div class="game-card" onclick="loadGame('spin')">🎡 Spin</div>
+  <div class="game-card" onclick="loadGame('fruit')">🍉 Fruit Hunt</div>
+  <div class="game-card" onclick="loadGame('ping')">🏓 Ping Pong</div>
+  <div class="game-card" onclick="loadGame('rolex')">⌚ Rolex</div>
+  <div class="game-card" onclick="loadGame('hero')">🚂 Casino Hero</div>
+  <div class="game-card" onclick="loadGame('blast')">🏏 Wicket Blast</div>
+  <div class="game-card" onclick="loadGame('bottle')">🍾 Spin the Bottle</div>
+  <div class="game-card" onclick="loadGame('jackpot')">💰 Jackpot</div>
 </div>
 
 <button onclick="logout()">Logout</button>
@@ -111,7 +114,7 @@
       const password = password.value;
       if (!ageCheck.checked) return error.textContent = "You must be 18+.";
       firebase.auth().createUserWithEmailAndPassword(email, password).then(cred => {
-        firebase.database().ref("users/" + cred.user.uid).set({ email, balance: 10, history: [] });
+        firebase.database().ref("users/" + cred.user.uid).set({ email, balance: 10 });
       }).catch(err => error.textContent = err.message);
     }
 
@@ -142,36 +145,14 @@
       firebase.database().ref("users/" + user.uid).once("value").then(snap => {
         const data = snap.val();
         document.getElementById("userBalance").textContent = data.balance;
-        history.innerHTML = data.history.map(h => `<li>${h}</li>`).join('');
-      });
-    }
-
-    function deposit() {
-      alert("Redirecting to Paystack...");
-      window.open("https://paystack.com/buy/casino-x-wgojzd", "_blank");
-    }
-
-    function withdraw() {
-      const amount = prompt("Enter amount to withdraw (min $5):");
-      if (!amount || isNaN(amount) || Number(amount) < 5) return alert("Invalid amount.");
-      const user = firebase.auth().currentUser;
-      const ref = firebase.database().ref("users/" + user.uid);
-      ref.once("value").then(snapshot => {
-        let data = snapshot.val();
-        if (data.balance >= Number(amount)) {
-          data.balance -= Number(amount);
-          data.history.push(`Withdrawal of $${amount}`);
-          ref.set(data);
-          alert("Withdrawal requested. Processing...");
-          updateBalance();
-        } else alert("Insufficient balance.");
       });
     }
 
     function loadGame(name) {
       dashboard.classList.add("hidden");
       gameScreen.classList.remove("hidden");
-      gameScreen.innerHTML = `<h2>${name.toUpperCase()}</h2><p>Bet: <input id='bet' type='number'><button onclick='playGame("${name}")'>Play</button></p><div id='gameArea'></div><button onclick='backToMenu()'>Back</button>`;
+      let gameHTML = `<h2>${name.toUpperCase()}</h2><p>Enter Bet: <input id='bet' type='number'><button onclick='playGame("${name}")'>Play</button></p><div id='gameArea'></div><br><button onclick='backToMenu()'>Back</button>`;
+      gameScreen.innerHTML = gameHTML;
     }
 
     function backToMenu() {
@@ -186,31 +167,29 @@
       const ref = firebase.database().ref("users/" + user.uid);
       ref.once("value").then(snapshot => {
         let data = snapshot.val();
-        if (data.balance < bet) return alert("Insufficient balance.");
+        if (data.balance < bet) return alert("Insufficient funds to play this game.");
         let win = Math.random() < 0.5;
         let payout = win ? bet * 2 : 0;
-        let result = win ? `🎉 Won $${payout}` : `❌ Lost $${bet}`;
+        let result = win ? `🎉 You Won $${payout}` : `❌ You Lost $${bet}`;
 
         if (name === 'mines') {
-          let gridHTML = '<div class="grid">';
-          for (let i = 0; i < 25; i++) gridHTML += `<div onclick='this.innerHTML="💣"; this.style.background="red"'></div>`;
-          gridHTML += '</div>';
-          document.getElementById("gameArea").innerHTML = gridHTML + `<p>${result}</p>`;
+          let grid = '<div class="grid">';
+          for (let i = 0; i < 25; i++) grid += `<div onclick='this.innerHTML="💣"'></div>`;
+          grid += '</div>';
+          document.getElementById("gameArea").innerHTML = grid + `<p>${result}</p>`;
         } else if (name === 'aviator') {
-          let multiplier = (1 + Math.random() * 4).toFixed(2);
-          payout = win ? bet * multiplier : 0;
-          result = win ? `✈ Flew x${multiplier}, You Won $${payout}` : `✈ Crashed. Lost $${bet}`;
+          let odds = (1 + Math.random() * 5).toFixed(2);
+          payout = win ? bet * odds : 0;
+          result = win ? `✈ Flew x${odds}, You Won $${payout}` : `✈ Crashed. Lost $${bet}`;
           document.getElementById("gameArea").innerHTML = `<p>${result}</p>`;
         } else {
           document.getElementById("gameArea").innerHTML = `<p>${result}</p>`;
         }
 
         data.balance = win ? data.balance - bet + payout : data.balance - bet;
-        data.history = data.history || [];
-        data.history.push(`${name.toUpperCase()}: ${result}`);
         ref.set(data);
         updateBalance();
       });
     }
   </script></body>
-  </html>
+</html
