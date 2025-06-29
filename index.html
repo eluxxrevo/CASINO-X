@@ -1,137 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Casino-X 🎰</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <!-- Style -->
   <style>
     body {
       margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: url('https://i.imgur.com/Ya0zL4h.gif') no-repeat center center fixed;
-      background-size: cover;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
       color: #fff;
+      text-align: center;
     }
     .container {
       padding: 20px;
-      text-align: center;
     }
     input, button {
-      padding: 12px;
-      margin: 8px;
-      width: 80%;
-      max-width: 300px;
-      border-radius: 8px;
+      padding: 10px;
+      margin: 5px;
       border: none;
-      outline: none;
-      background: rgba(255,255,255,0.1);
-      color: #fff;
+      border-radius: 5px;
       font-size: 16px;
     }
     button {
-      background: #0f0;
+      background-color: #0f0;
       color: #000;
       font-weight: bold;
+      cursor: pointer;
     }
     .hidden {
       display: none;
     }
-    .game-icons {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      padding: 20px;
-    }
-    .game-tile {
-      background: rgba(0,0,0,0.6);
-      padding: 15px;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-    .game-tile:hover {
-      background: rgba(0,0,0,0.8);
+    .game-link {
+      display: block;
+      margin: 10px 0;
+      font-size: 18px;
+      color: #0f0;
+      text-decoration: underline;
     }
     .footer {
-      text-align: center;
-      padding: 20px;
+      margin-top: 40px;
       font-size: 12px;
-      color: #ccc;
     }
-    .profile-section {
-      background: rgba(0,0,0,0.7);
-      padding: 15px;
-      margin: 20px auto;
-      max-width: 400px;
-      border-radius: 12px;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, 50px);
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
     }
-    .game-area {
-      padding: 20px;
-    }
-    .cell {
-      display: inline-block;
-      width: 40px;
-      height: 40px;
+    .grid div {
+      width: 50px;
+      height: 50px;
       background: #222;
-      margin: 3px;
+      line-height: 50px;
       font-size: 24px;
-      line-height: 40px;
-      text-align: center;
-      border-radius: 8px;
+      border-radius: 5px;
       cursor: pointer;
+    }
+    #profileSection {
+      margin-top: 30px;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 15px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container" id="auth">
-    <h2>Welcome to Casino-X 🎰</h2>
-    <input type="email" id="email" placeholder="Email"><br>
+  <div id="auth" class="container">
+    <h1>Welcome to Casino-X 🎰</h1>
+    <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password"><br>
-    <label>
-      <input type="checkbox" id="ageCheck"> I am 18+ and agree to <a href="#">terms</a>
-    </label><br>
+    <label><input type="checkbox" id="ageCheck"> I am 18+ and agree to the Terms</label><br>
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
-    <p id="error" style="color:red;"></p>
-  </div>
+    <p id="error" style="color:red"></p>
+  </div>  <div id="dashboard" class="container hidden">
+    <h2>Hello, <span id="userEmail"></span> 👋</h2>
+    <p>Balance: $<span id="userBalance">0</span></p><h3>Casino Games 🎮</h3>
+<a class="game-link" href="#" onclick="loadGame('mines')">💣 Mines</a>
+<a class="game-link" href="#" onclick="loadGame('aviator')">✈ Aviator</a>
 
-  <div class="container hidden" id="dashboard">
-    <h2>Hello, <span id="userEmail"></span></h2>
-    <p>💰 Balance: $<span id="userBalance">0</span></p>
-    <button onclick="showProfile()">My Profile</button>
-    <div class="game-icons">
-      <div class="game-tile" onclick="loadGame('mines')">💣 Mines</div>
-      <div class="game-tile" onclick="loadGame('spin')">🍾 Spin the Bottle</div>
-      <div class="game-tile" onclick="loadGame('rolex')">⌚ Rolex</div>
-      <div class="game-tile" onclick="loadGame('fruit')">🍎 Fruit Hunt</div>
-      <div class="game-tile" onclick="loadGame('spinto')">🎡 Spin to Win</div>
-      <div class="game-tile" onclick="loadGame('aviator')">✈ Aviator</div>
-      <div class="game-tile" onclick="loadGame('hero')">🚂 Casino Hero</div>
-      <div class="game-tile" onclick="loadGame('pong')">🏓 Ping-pong</div>
-      <div class="game-tile" onclick="loadGame('wicket')">🏏 Wicket Blast</div>
-      <div class="game-tile" onclick="logout()">🚪 Logout</div>
-    </div>
-    <div id="gameContainer" class="game-area"></div>
-  </div>
+<div id="profileSection">
+  <h3>👤 Profile</h3>
+  <button onclick="deposit()">💵 Deposit</button>
+  <button onclick="withdraw()">💸 Withdraw</button>
+  <h4>Transactions</h4>
+  <ul id="history"></ul>
+</div>
 
-  <div class="container hidden" id="profile">
-    <div class="profile-section">
-      <h3>👤 My Profile</h3>
-      <p>Email: <span id="profileEmail"></span></p>
-      <p>Balance: $<span id="profileBalance">0</span></p>
-      <button onclick="window.open('https://paystack.com/buy/casino-x-wgojzd','_blank')">Deposit via Paystack</button><br>
-      <input type="number" id="withdrawAmount" placeholder="Withdraw amount"><br>
-      <button onclick="withdraw()">Withdraw</button><br>
-      <button onclick="backToDashboard()">⬅ Back</button>
-    </div>
-  </div 
-  <!-- Scripts -->
-  <script>
-    // Firebase config
+<button onclick="logout()">Logout</button>
+<div class="footer">Endorsed by Reverend</div>
+
+  </div>  <div id="gameScreen" class="hidden container"></div>  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDOfuS7bXfY8AouF3SoP17jzCQTPH90K9w",
       authDomain: "casino-x-87092.firebaseapp.com",
@@ -144,157 +107,110 @@
     firebase.initializeApp(firebaseConfig);
 
     function register() {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      if (!ageCheck.checked) return error.textContent = "You must confirm you're 18+.";
-      firebase.auth().createUserWithEmailAndPassword(email, password).then(user => {
-        firebase.database().ref("users/" + user.user.uid).set({
-          email: email,
-          balance: 10
-        });
-      }).catch(e => error.textContent = e.message);
+      const email = email.value;
+      const password = password.value;
+      if (!ageCheck.checked) return error.textContent = "You must be 18+.";
+      firebase.auth().createUserWithEmailAndPassword(email, password).then(cred => {
+        firebase.database().ref("users/" + cred.user.uid).set({ email, balance: 10, history: [] });
+      }).catch(err => error.textContent = err.message);
     }
 
     function login() {
-      firebase.auth().signInWithEmailAndPassword(emailInput.value, passwordInput.value)
-        .catch(e => error.textContent = e.message);
+      firebase.auth().signInWithEmailAndPassword(email.value, password.value).catch(err => error.textContent = err.message);
     }
 
     function logout() {
       firebase.auth().signOut();
     }
 
-    function showProfile() {
-      profile.classList.remove('hidden');
-      dashboard.classList.add('hidden');
-      const user = firebase.auth().currentUser;
-      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
-        const data = snap.val();
-        profileEmail.textContent = user.email;
-        profileBalance.textContent = data.balance;
-      });
-    }
-
-    function backToDashboard() {
-      profile.classList.add('hidden');
-      dashboard.classList.remove('hidden');
-      updateBalance();
-    }
-
-    function withdraw() {
-      const amount = parseFloat(withdrawAmount.value);
-      const user = firebase.auth().currentUser;
-      if (!user || amount < 5) return alert("Min $5 to withdraw.");
-      const ref = firebase.database().ref("users/" + user.uid);
-      ref.once("value").then(snap => {
-        let balance = snap.val().balance;
-        if (balance >= amount) {
-          balance -= amount;
-          ref.update({ balance });
-          alert("Withdrawal request submitted!");
-          withdrawAmount.value = "";
-          profileBalance.textContent = balance;
-        } else {
-          alert("Insufficient balance.");
-        }
-      });
-    }
-
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        auth.classList.add('hidden');
-        dashboard.classList.remove('hidden');
-        userEmail.textContent = user.email;
+        auth.classList.add("hidden");
+        dashboard.classList.remove("hidden");
+        document.getElementById("userEmail").textContent = user.email;
         updateBalance();
       } else {
-        auth.classList.remove('hidden');
-        dashboard.classList.add('hidden');
+        auth.classList.remove("hidden");
+        dashboard.classList.add("hidden");
+        gameScreen.classList.add("hidden");
       }
     });
 
     function updateBalance() {
       const user = firebase.auth().currentUser;
       if (!user) return;
-      firebase.database().ref("users/" + user.uid).once("value").then(snapshot => {
-        const data = snapshot.val();
-        userBalance.textContent = (data && data.balance) || 0;
+      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+        const data = snap.val();
+        document.getElementById("userBalance").textContent = data.balance;
+        history.innerHTML = data.history.map(h => `<li>${h}</li>`).join('');
       });
     }
 
-    function loadGame(game) {
-      const bet = prompt("Enter your bet amount:");
+    function deposit() {
+      alert("Redirecting to Paystack...");
+      window.open("https://paystack.com/buy/casino-x-wgojzd", "_blank");
+    }
+
+    function withdraw() {
+      const amount = prompt("Enter amount to withdraw (min $5):");
+      if (!amount || isNaN(amount) || Number(amount) < 5) return alert("Invalid amount.");
       const user = firebase.auth().currentUser;
-      if (!user || !bet || isNaN(bet) || bet <= 0) return;
+      const ref = firebase.database().ref("users/" + user.uid);
+      ref.once("value").then(snapshot => {
+        let data = snapshot.val();
+        if (data.balance >= Number(amount)) {
+          data.balance -= Number(amount);
+          data.history.push(`Withdrawal of $${amount}`);
+          ref.set(data);
+          alert("Withdrawal requested. Processing...");
+          updateBalance();
+        } else alert("Insufficient balance.");
+      });
+    }
 
-      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
-        let balance = snap.val().balance;
-        if (balance < bet) return alert("Insufficient balance.");
+    function loadGame(name) {
+      dashboard.classList.add("hidden");
+      gameScreen.classList.remove("hidden");
+      gameScreen.innerHTML = `<h2>${name.toUpperCase()}</h2><p>Bet: <input id='bet' type='number'><button onclick='playGame("${name}")'>Play</button></p><div id='gameArea'></div><button onclick='backToMenu()'>Back</button>`;
+    }
 
-        let win = false;
-        let payout = 0;
-        let output = "";
+    function backToMenu() {
+      gameScreen.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+    }
 
-        if (game === "mines") {
-          const gridSize = 5;
-          let mineCount = Math.floor(Math.random() * 5 + 1);
-          let board = "";
-          for (let i = 0; i < gridSize * gridSize; i++) {
-            board += `<div class="cell" onclick="this.style.background='red'">💠</div>`;
-            if ((i + 1) % gridSize === 0) board += "<br>";
-          }
-          output = `<h3>Mines (${mineCount} hidden)</h3>${board}`;
-          payout = bet * 2;
-          win = Math.random() > 0.5;
-        } else if (game === "spin") {
-          const r = Math.floor(Math.random() * 360);
-          output = `The bottle landed on: ${r}°`;
-          win = r % 2 === 0;
-          payout = bet * 1.8;
-        } else if (game === "rolex") {
-          const d = Math.floor(Math.random() * 10);
-          output = `Rolex dial spun: ${d}`;
-          win = d > 5;
-          payout = bet * 2.5;
-        } else if (game === "fruit") {
-          const fruit = ["🍎", "🍊", "🍇"];
-          const spin = [fruit[Math.floor(Math.random()*3)], fruit[Math.floor(Math.random()*3)], fruit[Math.floor(Math.random()*3)]];
-          output = spin.join(" ");
-          win = spin[0] === spin[1] && spin[1] === spin[2];
-          payout = bet * 3;
-        } else if (game === "spinto") {
-          const prize = Math.random();
-          win = prize > 0.6;
-          output = `Spun the wheel... ${win ? "You win!" : "Try again!"}`;
-          payout = bet * 2;
-        } else if (game === "aviator") {
-          let multiplier = parseFloat((1 + Math.random() * 4).toFixed(2));
-          win = Math.random() > 0.5;
-          output = `🛫 Plane reached x${multiplier} before crashing!`;
+    function playGame(name) {
+      const user = firebase.auth().currentUser;
+      const bet = parseFloat(document.getElementById("bet").value);
+      if (!user || isNaN(bet) || bet <= 0) return alert("Enter valid bet.");
+      const ref = firebase.database().ref("users/" + user.uid);
+      ref.once("value").then(snapshot => {
+        let data = snapshot.val();
+        if (data.balance < bet) return alert("Insufficient balance.");
+        let win = Math.random() < 0.5;
+        let payout = win ? bet * 2 : 0;
+        let result = win ? `🎉 Won $${payout}` : `❌ Lost $${bet}`;
+
+        if (name === 'mines') {
+          let gridHTML = '<div class="grid">';
+          for (let i = 0; i < 25; i++) gridHTML += `<div onclick='this.innerHTML="💣"; this.style.background="red"'></div>`;
+          gridHTML += '</div>';
+          document.getElementById("gameArea").innerHTML = gridHTML + `<p>${result}</p>`;
+        } else if (name === 'aviator') {
+          let multiplier = (1 + Math.random() * 4).toFixed(2);
           payout = win ? bet * multiplier : 0;
-        } else if (game === "hero") {
-          let speed = parseFloat((Math.random() * 5).toFixed(1));
-          win = speed > 2;
-          output = `🚂 Train speed: ${speed}x`;
-          payout = win ? bet * speed : 0;
-        } else if (game === "pong") {
-          win = Math.random() > 0.5;
-          output = win ? "🏓 You scored a point!" : "Missed!";
-          payout = win ? bet * 2 : 0;
-        } else if (game === "wicket") {
-          let hit = Math.random();
-          win = hit > 0.5;
-          output = win ? "🏏 You hit a six!" : "You got bowled!";
-          payout = win ? bet * 2.2 : 0;
+          result = win ? `✈ Flew x${multiplier}, You Won $${payout}` : `✈ Crashed. Lost $${bet}`;
+          document.getElementById("gameArea").innerHTML = `<p>${result}</p>`;
+        } else {
+          document.getElementById("gameArea").innerHTML = `<p>${result}</p>`;
         }
 
-        let finalBalance = win ? balance + payout : balance - bet;
-        firebase.database().ref("users/" + user.uid).update({ balance: finalBalance });
-        gameContainer.innerHTML = `<p>${output}</p><p>${win ? `🎉 Won $${payout}` : `❌ Lost $${bet}`}</p><button onclick="backToDashboard()">Back</button>`;
+        data.balance = win ? data.balance - bet + payout : data.balance - bet;
+        data.history = data.history || [];
+        data.history.push(`${name.toUpperCase()}: ${result}`);
+        ref.set(data);
         updateBalance();
       });
     }
-  </script>
-
-  <div class="footer">© 2025 Casino-X | Endorsed by Reverend</div>
-</body>
+  </script></body>
   </html>
