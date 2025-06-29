@@ -1,7 +1,8 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Casino-X 🎰</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
@@ -9,9 +10,9 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1e3c72, #2a5298);
-      color: #fff;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to right, #2c3e50, #3498db);
+      color: white;
       text-align: center;
     }
     .container {
@@ -20,84 +21,83 @@
     input, button {
       padding: 10px;
       margin: 5px;
+      border-radius: 6px;
       border: none;
-      border-radius: 5px;
       font-size: 16px;
     }
     button {
-      background-color: #0f0;
+      background: #0f0;
       color: #000;
       font-weight: bold;
-      cursor: pointer;
     }
     .hidden {
       display: none;
     }
     .game-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
       margin-top: 20px;
     }
-    .game-card {
-      width: 140px;
+    .game-box {
       background: #111;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 15px;
+      border-radius: 8px;
       cursor: pointer;
-      color: #0f0;
     }
     .footer {
-      margin-top: 40px;
-      font-size: 12px;
+      margin-top: 30px;
+      font-size: 14px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(5, 50px);
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .grid div {
-      width: 50px;
-      height: 50px;
-      background: #222;
-      line-height: 50px;
-      font-size: 24px;
-      border-radius: 5px;
-      cursor: pointer;
+    .game-page {
+      padding: 20px;
     }
   </style>
 </head>
 <body>
   <div id="auth" class="container">
-    <h1>Casino-X 🎰</h1>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password"><br>
-    <label><input type="checkbox" id="ageCheck"> I am 18+ and agree to the Terms</label><br>
+    <h1>🎰 Casino-X Login/Register</h1>
+    <input type="email" id="email" placeholder="Email" /><br />
+    <input type="password" id="password" placeholder="Password" /><br />
+    <label><input type="checkbox" id="ageCheck" /> I am 18+ and agree to Terms</label><br />
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
-    <p id="error" style="color:red"></p>
-  </div>  <div id="dashboard" class="container hidden">
-    <h2>Hello, <span id="userEmail"></span></h2>
-    <p>Balance: $<span id="userBalance">10</span></p><div class="game-grid">
-  <div class="game-card" onclick="loadGame('mines')">💣 Mines</div>
-  <div class="game-card" onclick="loadGame('aviator')">✈ Aviator</div>
-  <div class="game-card" onclick="loadGame('spin')">🎡 Spin</div>
-  <div class="game-card" onclick="loadGame('fruit')">🍉 Fruit Hunt</div>
-  <div class="game-card" onclick="loadGame('ping')">🏓 Ping Pong</div>
-  <div class="game-card" onclick="loadGame('rolex')">⌚ Rolex</div>
-  <div class="game-card" onclick="loadGame('hero')">🚂 Casino Hero</div>
-  <div class="game-card" onclick="loadGame('blast')">🏏 Wicket Blast</div>
-  <div class="game-card" onclick="loadGame('bottle')">🍾 Spin the Bottle</div>
-  <div class="game-card" onclick="loadGame('jackpot')">💰 Jackpot</div>
-</div>
+    <p id="error" style="color: red;"></p>
+  </div>
 
-<button onclick="logout()">Logout</button>
-<div class="footer">Endorsed by Reverend</div>
+  <div id="dashboard" class="container hidden">
+    <h2>Welcome, <span id="userEmail"></span></h2>
+    <p><strong>Balance:</strong> $<span id="balance">0</span></p>
 
-  </div>  <div id="gameScreen" class="hidden container"></div>  <script>
+    <a href="https://paystack.com/buy/casino-x-wgojzd" target="_blank">
+      <button>💳 Deposit</button>
+    </a>
+    <button onclick="showWithdraw()">Withdraw</button>
+    <div id="withdrawDiv" class="hidden">
+      <input id="withdrawAmount" type="number" placeholder="Enter amount to withdraw">
+      <button onclick="withdraw()">Submit Withdrawal</button>
+    </div>
+
+    <div class="game-grid">
+      <div class="game-box" onclick="loadGame('mines')">💣 Mines</div>
+      <div class="game-box" onclick="loadGame('aviator')">✈️ Aviator</div>
+      <div class="game-box" onclick="loadGame('spin')">🎡 Spin</div>
+      <div class="game-box" onclick="loadGame('fruit')">🍉 Fruit Hunt</div>
+      <div class="game-box" onclick="loadGame('pingpong')">🏓 Ping Pong</div>
+      <div class="game-box" onclick="loadGame('rolex')">⌚ Rolex</div>
+      <div class="game-box" onclick="loadGame('hero')">🚂 Casino Hero</div>
+      <div class="game-box" onclick="loadGame('wicket')">🏏 Wicket Blast</div>
+      <div class="game-box" onclick="loadGame('bottle')">🍾 Spin the Bottle</div>
+      <div class="game-box" onclick="loadGame('jackpot')">💰 Jackpot</div>
+    </div>
+    <br>
+    <button onclick="logout()">Logout</button>
+    <div class="footer">Endorsed by Reverend</div>
+  </div>
+
+  <div id="gameView" class="hidden game-page"></div>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDOfuS7bXfY8AouF3SoP17jzCQTPH90K9w",
       authDomain: "casino-x-87092.firebaseapp.com",
@@ -110,86 +110,193 @@
     firebase.initializeApp(firebaseConfig);
 
     function register() {
-      const email = email.value;
-      const password = password.value;
-      if (!ageCheck.checked) return error.textContent = "You must be 18+.";
-      firebase.auth().createUserWithEmailAndPassword(email, password).then(cred => {
-        firebase.database().ref("users/" + cred.user.uid).set({ email, balance: 10 });
-      }).catch(err => error.textContent = err.message);
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const ageChecked = document.getElementById("ageCheck").checked;
+      if (!ageChecked) return document.getElementById("error").innerText = "You must confirm you're 18+.";
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((cred) => {
+          firebase.database().ref("users/" + cred.user.uid).set({
+            email: email,
+            balance: 10
+          });
+        })
+        .catch((e) => document.getElementById("error").innerText = e.message);
     }
 
     function login() {
-      firebase.auth().signInWithEmailAndPassword(email.value, password.value).catch(err => error.textContent = err.message);
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      firebase.auth().signInWithEmailAndPassword(email, password)
+        .catch((e) => document.getElementById("error").innerText = e.message);
     }
 
     function logout() {
       firebase.auth().signOut();
     }
 
-    firebase.auth().onAuthStateChanged(user => {
+    firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        auth.classList.add("hidden");
-        dashboard.classList.remove("hidden");
-        document.getElementById("userEmail").textContent = user.email;
+        document.getElementById("auth").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("userEmail").innerText = user.email;
         updateBalance();
       } else {
-        auth.classList.remove("hidden");
-        dashboard.classList.add("hidden");
-        gameScreen.classList.add("hidden");
+        document.getElementById("auth").classList.remove("hidden");
+        document.getElementById("dashboard").classList.add("hidden");
+        document.getElementById("gameView").classList.add("hidden");
       }
     });
 
     function updateBalance() {
       const user = firebase.auth().currentUser;
       if (!user) return;
-      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
-        const data = snap.val();
-        document.getElementById("userBalance").textContent = data.balance;
+      firebase.database().ref("users/" + user.uid).once("value").then((snapshot) => {
+        document.getElementById("balance").innerText = snapshot.val().balance || 0;
       });
     }
 
-    function loadGame(name) {
-      dashboard.classList.add("hidden");
-      gameScreen.classList.remove("hidden");
-      let gameHTML = `<h2>${name.toUpperCase()}</h2><p>Enter Bet: <input id='bet' type='number'><button onclick='playGame("${name}")'>Play</button></p><div id='gameArea'></div><br><button onclick='backToMenu()'>Back</button>`;
-      gameScreen.innerHTML = gameHTML;
+    function showWithdraw() {
+      document.getElementById("withdrawDiv").classList.toggle("hidden");
     }
 
-    function backToMenu() {
-      gameScreen.classList.add("hidden");
-      dashboard.classList.remove("hidden");
-    }
-
-    function playGame(name) {
+    function withdraw() {
+      const amount = parseFloat(document.getElementById("withdrawAmount").value);
       const user = firebase.auth().currentUser;
-      const bet = parseFloat(document.getElementById("bet").value);
-      if (!user || isNaN(bet) || bet <= 0) return alert("Enter valid bet.");
-      const ref = firebase.database().ref("users/" + user.uid);
-      ref.once("value").then(snapshot => {
-        let data = snapshot.val();
-        if (data.balance < bet) return alert("Insufficient funds to play this game.");
-        let win = Math.random() < 0.5;
-        let payout = win ? bet * 2 : 0;
-        let result = win ? `🎉 You Won $${payout}` : `❌ You Lost $${bet}`;
-
-        if (name === 'mines') {
-          let grid = '<div class="grid">';
-          for (let i = 0; i < 25; i++) grid += `<div onclick='this.innerHTML="💣"'></div>`;
-          grid += '</div>';
-          document.getElementById("gameArea").innerHTML = grid + `<p>${result}</p>`;
-        } else if (name === 'aviator') {
-          let odds = (1 + Math.random() * 5).toFixed(2);
-          payout = win ? bet * odds : 0;
-          result = win ? `✈ Flew x${odds}, You Won $${payout}` : `✈ Crashed. Lost $${bet}`;
-          document.getElementById("gameArea").innerHTML = `<p>${result}</p>`;
+      if (!user || isNaN(amount)) return alert("Enter a valid amount");
+      firebase.database().ref("users/" + user.uid).once("value").then((snap) => {
+        let bal = snap.val().balance;
+        if (bal >= amount && amount >= 5) {
+          let newBal = bal - amount;
+          firebase.database().ref("users/" + user.uid).update({ balance: newBal });
+          alert("Withdrawal request submitted");
+          updateBalance();
         } else {
-          document.getElementById("gameArea").innerHTML = `<p>${result}</p>`;
+          alert("Insufficient funds or minimum withdrawal is $5");
         }
+      });
+    }
 
-        data.balance = win ? data.balance - bet + payout : data.balance - bet;
-        ref.set(data);
+    function loadGame(game) {
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("gameView").classList.remove("hidden");
+      document.getElementById("gameView").innerHTML = `
+        <h2>${game.toUpperCase()}</h2>
+        <p>Enter Bet: <input type='number' id='betInput'><button onclick='play("${game}")'>Play</button></p>
+        <div id='gameResult'></div>
+        <br><button onclick='goBack()'>Back to Menu</button>
+      `;
+    }
+
+    function goBack() {
+      document.getElementById("gameView").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+    }
+
+    function play(game) {
+      const user = firebase.auth().currentUser;
+      const bet = parseFloat(document.getElementById("betInput").value);
+      if (!user || isNaN(bet)) return alert("Enter valid bet.");
+      firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+        let bal = snap.val().balance;
+        if (bal < bet) return alert("Insufficient funds");
+        let win = Math.random() < 0.5;
+        let result = win ? `🎉 You won $${bet * 2}` : `❌ You lost $${bet}`;
+        let newBal = win ? bal - bet + bet * 2 : bal - bet;
+        firebase.database().ref("users/" + user.uid).update({ balance: newBal });
+        document.getElementById("gameResult").innerHTML = `<p>${result}</p>`;
         updateBalance();
       });
     }
-  </script></body>
-</html
+  
+<script>
+  // You can extend individual game logic here
+  // Example: Mines game with 5x5 grid
+  function loadGame(game) {
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById("gameView").classList.remove("hidden");
+
+    if (game === "mines") {
+      let gridHTML = '';
+      for (let i = 0; i < 25; i++) {
+        gridHTML += `<button onclick='selectMine(${i})' style='width:50px;height:50px;margin:5px'>❓</button>`;
+      }
+      document.getElementById("gameView").innerHTML = `
+        <h2>Mines Game</h2>
+        <p>Bet: <input id='betInput' type='number'> <button onclick='startMines()'>Start</button></p>
+        <div id='mineGrid'>${gridHTML}</div>
+        <p id='mineStatus'></p>
+        <br><button onclick='goBack()'>Back</button>
+      `;
+    } else {
+      // All other games fallback
+      document.getElementById("gameView").innerHTML = `
+        <h2>${game.toUpperCase()}</h2>
+        <p>Enter Bet: <input type='number' id='betInput'><button onclick='play("${game}")'>Play</button></p>
+        <div id='gameResult'></div>
+        <br><button onclick='goBack()'>Back to Menu</button>
+      `;
+    }
+  }
+
+  function startMines() {
+    const bet = parseFloat(document.getElementById("betInput").value);
+    const user = firebase.auth().currentUser;
+    if (!user || isNaN(bet)) return alert("Enter valid bet.");
+
+    firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+      const bal = snap.val().balance;
+      if (bal < bet) return alert("Insufficient funds");
+
+      window.mineGame = {
+        bet: bet,
+        mines: [],
+        clicked: [],
+        balanceBefore: bal
+      };
+
+      while (mineGame.mines.length < 5) {
+        const r = Math.floor(Math.random() * 25);
+        if (!mineGame.mines.includes(r)) mineGame.mines.push(r);
+      }
+
+      firebase.database().ref("users/" + user.uid).update({
+        balance: bal - bet
+      });
+      updateBalance();
+      document.getElementById("mineStatus").innerText = "Choose safe tiles!";
+    });
+  }
+
+  function selectMine(index) {
+    if (!window.mineGame || window.mineGame.clicked.includes(index)) return;
+
+    window.mineGame.clicked.push(index);
+    const isMine = window.mineGame.mines.includes(index);
+
+    const buttons = document.querySelectorAll("#mineGrid button");
+    buttons[index].innerText = isMine ? "💣" : "✅";
+    buttons[index].disabled = true;
+
+    if (isMine) {
+      document.getElementById("mineStatus").innerText = "💥 You hit a mine! Game over.";
+    } else {
+      let reward = window.mineGame.bet * 0.5 * window.mineGame.clicked.length;
+      document.getElementById("mineStatus").innerText = `✅ Safe! You can cash out now for $${reward.toFixed(2)} or continue.`;
+
+      // Auto cash out after 3 safe picks
+      if (window.mineGame.clicked.length === 3) {
+        const user = firebase.auth().currentUser;
+        firebase.database().ref("users/" + user.uid).once("value").then(snap => {
+          const bal = snap.val().balance;
+          firebase.database().ref("users/" + user.uid).update({
+            balance: bal + reward
+          });
+          updateBalance();
+          document.getElementById("mineStatus").innerText = `🎉 You cashed out with $${reward.toFixed(2)}!`;
+        });
+      }
+    }
+  }
+</script>
+</html>
