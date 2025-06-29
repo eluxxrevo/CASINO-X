@@ -1,2 +1,2 @@
-# CASINO-X
+# CASINO-REV
 Bet like a genius
